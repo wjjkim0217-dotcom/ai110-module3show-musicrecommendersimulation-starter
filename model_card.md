@@ -60,7 +60,7 @@ The catalog is `data/songs.csv`. It has 18 songs.
 
 **Features.** Each song has a title, artist, genre, mood, energy, tempo, valence, danceability and acousticness. The scorer only uses genre, mood, energy and acousticness.
 
-**Coverage.** There are 15 genres and 14 moods. Lofi has 4 songs. Pop has 2. The other 13 genres have only 1 song each.
+**Coverage.** There are 15 genres and 14 moods. Lofi has 3 songs. Pop has 2. The other 13 genres have only 1 song each.
 
 **What I changed.** The starter had fewer songs. I added more songs and more genres.
 
@@ -87,7 +87,7 @@ The catalog is `data/songs.csv`. It has 18 songs.
 
 Where the system struggles or behaves unfairly. 
 
-The biggest weakness I found is that the genre and mood bonuses (up to 2.0 of the 3.67 possible points) can override what the user says about energy, which I saw in the "High Energy + Sad" test profile. That profile asked for energy 0.9 but blues and sad, and the system's top pick was Blue Highway Blues, a slow song with energy 0.40, which scored 2.75 against 1.66 for the best high-energy song. The problem is made worse by the catalog: 13 of 15 genres have only one song, so a rock, jazz or metal fan gets one strong match and then a steep drop to songs that share neither their genre nor their mood, while a lofi fan gets four good matches. Doubling the energy weight and halving the genre weight shrank that blues lead from 1.09 to 0.02, which shows the category weights, not the user's numbers, were deciding the result. In practice this means users with unusual combinations of tastes, or tastes in a small genre, are served worse than users whose tastes match the most common labels.
+The biggest weakness I found is that the genre and mood bonuses (up to 2.0 of the 3.67 possible points) can override what the user says about energy, which I saw in the "High Energy + Sad" test profile. That profile asked for energy 0.9 but blues and sad, and the system's top pick was Blue Highway Blues, a slow song with energy 0.40, which scored 2.75 against 1.66 for the best high-energy song. The problem is made worse by the catalog: 13 of 15 genres have only one song, so a rock, jazz or metal fan gets one strong match and then a steep drop to songs that share neither their genre nor their mood, while a lofi fan gets three good matches. Doubling the energy weight and halving the genre weight shrank that blues lead from 1.09 to 0.02, which shows the category weights, not the user's numbers, were deciding the result. In practice this means users with unusual combinations of tastes, or tastes in a small genre, are served worse than users whose tastes match the most common labels.
 
 ---
 
@@ -106,7 +106,7 @@ How you checked whether the recommender behaved as expected.
 **What surprised me.**
 - A user asking for energy 0.9 who also picked blues and sad got Blue Highway Blues (energy 0.40) at 2.75, against 1.66 for the best high-energy song, because the genre and mood bonuses (2.0 together) outweigh the energy term (at most 1.17).
 - Energy and acousticness correlate at r = -0.97 in the catalog, so the acousticness term adds little beyond energy, and the "Energetic + Acoustic" profile earned only +0.08 for its acoustic request.
-- 13 of 15 genres have a single song, so rock, jazz and metal fans get one strong match and then a steep drop, while a lofi fan gets four.
+- 13 of 15 genres have a single song, so rock, jazz and metal fans get one strong match and then a steep drop, while a lofi fan gets three.
 
 **Comparisons and fixes.**
 - Weight shift: doubling the energy weight and halving the genre weight left every #1 unchanged but cut the blues lead in the conflicting profile from 1.09 to 0.02, and pushed both pop songs out of the top 3 in the split profile.
@@ -127,7 +127,7 @@ How you checked whether the recommender behaved as expected.
 
 Across all ten, the output moves the way the preferences say it should in the numeric terms (pairs 1, 3, 9 and 10) and in the genre and mood matches (pair 2). The invalid results come from places where those terms disagree with each other (pairs 4, 7 and 8) or where the input is not recognised (pairs 5 and 6).
 
-**Limits of this evaluation.** The catalog has only 18 songs and I tested by reading results, not with a held-out set of real listeners, so these checks show how the scoring behaves and not whether real users would be happy. The existing pytest suite was not run (pytest is not installed in my environment), and it does not test `score_song`.
+**Limits of this evaluation.** The catalog has only 18 songs and I tested by reading results, not with a held-out set of real listeners, so these checks show how the scoring behaves and not whether real users would be happy. The pytest suite (8 tests, all passing) checks `score_song` and `recommend_songs` on small hand-made cases, but it does not replace testing with real listeners.
 
 ---
 
@@ -155,7 +155,7 @@ It was fast and it gave me a lot to look at. That made it easy to see patterns, 
 
 **When I had to double-check it.**
 - Numbers in the write-up. Scores, ranks and correlations (like r = -0.97) need to match the real output. I re-ran them.
-- Tests. The pytest suite was not run, and it does not test `score_song`. A passing story is not a passing test.
+- Tests. The starter tests did not cover `score_song`, so I added tests for it and for `recommend_songs`. A passing story is not a passing test.
 - Bugs it only found after I probed. "Pop" and "pop" scored differently. Energy 2.0 gave a negative score. An empty profile crashed. The first draft of the code did not handle any of these.
 - Explanations. The AI can sound sure about why a result happened. I checked by changing one weight and watching the output.
 

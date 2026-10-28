@@ -11,7 +11,7 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+My version is a small, content-based music recommender. It loads an 18-song catalog from a CSV file. A user gives a favorite genre, a favorite mood, and targets for energy and acousticness. The system scores every song, sorts the scores, and shows the top five. Each pick comes with plain-language reasons, such as "mood matches 'happy' (+1.00)". I tested it with ten profiles, including seven built to trick it. The main finding is that the genre and mood bonuses can override what a user asks for in energy. See the [Model Card](model_card.md) for the full evaluation.
 
 ---
 
@@ -125,6 +125,7 @@ OUTPUT    sort by score (highest first) -> top k as (song, score, explanation)
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
+   ```
 
 2. Install dependencies
 
@@ -667,7 +668,7 @@ The #1 song stayed the same for all ten profiles. The rest of the ranking moved 
 | Profile | Original top 3 | Shifted top 3 | What changed |
 |---|---|---|---|
 | High-Energy Pop | Sunrise City 3.62, Gym Hero 2.53, Rooftop Lights 2.46 | Sunrise City 4.25, Rooftop Lights 3.53, Gym Hero 3.10 | #2 and #3 swap. Gym Hero's genre match is now worth half as much, so Rooftop Lights' mood match wins. |
-| Deep Intense Rock | Storm Runner 3.66, Gym Hero 2.63, Pulse Cathedral 1.60 | Storm Runner 4.32, Gym Hero 3.79, Pulse Cathedral 2.74 | The order is unchanged, but the gap between #2 and #3 shrinks from 1.03 to 1.05 only in absolute terms. Relative to the top score it stays similar. |
+| Deep Intense Rock | Storm Runner 3.66, Gym Hero 2.63, Pulse Cathedral 1.60 | Storm Runner 4.32, Gym Hero 3.79, Pulse Cathedral 2.74 | The order is unchanged. The gap between #2 and #3 is about the same (1.03 before, 1.05 after). |
 | Conflict: High Energy + Sad | Blue Highway Blues 2.75, Storm Runner 1.66, Gym Hero 1.61 | Blue Highway Blues 2.84, Storm Runner 2.82, Gym Hero 2.74 | The sad blues song still wins, but its lead over Storm Runner falls from 1.09 to 0.02. It is now close to a tie. |
 | Split: Pop Genre + Sad Mood | Blue Highway Blues 2.42, Sunrise City 2.14, Gym Hero 1.94 | Blue Highway Blues 3.48, Velvet Hours 2.73, Dusty Porch Light 2.63 | Both pop songs fall out of the top 3. Genre is now worth only 0.5, so mid-energy songs with no category match outrank them. |
 | Out of Range: energy 2.0 (measured before input clamping was added) | Pulse Cathedral 2.42, Iron Requiem 0.45 | Pulse Cathedral 1.86, Iron Requiem 0.41 | Doubling the energy weight made the out-of-range energy penalty worse (Sunrise City went to -0.01). Input clamping has since removed this problem. |
@@ -686,7 +687,7 @@ Other experiment still to try: adding tempo or valence to the score. (Clamping a
 
 I reviewed `src/recommender.py` and `data/songs.csv` for filter bubbles and bias, and checked each suspicion with a script (3,780 generated profiles covering every catalog genre and mood across six energy targets and three acousticness targets). Findings, most serious first:
 
-1. **Uneven service by genre.** 13 of 15 genres and 11 of 14 moods have exactly one song. A lofi fan gets four strong matches (all above 2.5), but a rock, jazz or metal fan gets one strong match and then a steep drop (rock: 3.47, then 2.42, then 1.42). The second pick for a jazz or metal fan shares neither genre nor mood with them. Users of well-represented genres get a much fuller experience.
+1. **Uneven service by genre.** 13 of 15 genres and 11 of 14 moods have exactly one song. A lofi fan gets three strong matches (all above 2.5), but a rock, jazz or metal fan gets one strong match and then a steep drop (rock: 3.47, then 2.42, then 1.42). The second pick for a jazz or metal fan shares neither genre nor mood with them. Users of well-represented genres get a much fuller experience.
 2. **Categories are all-or-nothing.** Genre and mood are exact string matches worth up to 2.0 of 3.67 points, and related labels get no partial credit: `pop` vs `indie pop`, `sad` vs `melancholic`, `chill` vs `relaxed`. Only 17 of the 210 possible genre+mood pairs exist in the catalog, so most combinations of tastes can never score above 2.67 (one category match plus perfect numeric closeness). There is also no diversity rule, so the top 5 can repeat an artist (Neon Echo and LoRoom each appear twice).
 3. **Energy and acousticness are the same signal.** In the catalog, energy and acousticness correlate at r = -0.97. Acousticness adds almost nothing beyond energy, and a user who wants both high energy and high acousticness (acoustic rock, unplugged sets) cannot be served: the energy term wins, and the acoustic request earns only +0.08 (see "Impossible: Energetic + Acoustic").
 4. **The energy gap is symmetric and favors the middle of the catalog.** The gap is fair in direction, but the catalog is not: only 4 of 18 songs have energy below 0.4 and none lies between 0.58 and 0.75. With no category match, a user targeting energy 0.6 gets a best score of 1.62 and one targeting 0.0 gets 1.19, so very low-energy users (sleep, ambient) are served worst. A single target number also cannot express a range, such as someone who likes both calm and intense music.
@@ -708,6 +709,6 @@ Read and complete `model_card.md`:
 
 **How recommenders turn data into predictions.** My recommender turns a user's taste into a score for every song, then shows the top five. Each song earns points for matching the user's genre and mood, and for being close to their energy and acousticness targets. There is no learning. It is only matching and distance. Even so, it felt like a real recommender. Sunrise City came first for a pop fan and Library Rain came first for a lofi fan. The "Why" lines made the picks feel understood. I also learned that the weights matter more than the code. Genre and mood were worth 2.0 points and energy at most 1.17, so a slow blues song beat every loud song for a user who asked for loud music. Halving the genre weight and doubling the energy weight cut that lead from 1.09 to 0.02.
 
-**Where bias or unfairness could show up.** The biggest problem is the data. 13 of 15 genres have only one song. A lofi fan gets four good matches, but a rock, jazz or metal fan gets one and then a steep drop. Users with common tastes are served better than users with niche or mixed tastes. Exact-match labels make it worse, because "pop" gets no credit for "indie pop". The catalog was also made by hand and leans toward Western pop styles. If this system learned from listening history, these gaps would grow into a real filter bubble. A diversity rule, partial credit for related labels and a much bigger catalog would help. See the [Model Card](model_card.md) for the full evaluation and my engineering reflection.
+**Where bias or unfairness could show up.** The biggest problem is the data. 13 of 15 genres have only one song. A lofi fan gets three good matches, but a rock, jazz or metal fan gets one and then a steep drop. Users with common tastes are served better than users with niche or mixed tastes. Exact-match labels make it worse, because "pop" gets no credit for "indie pop". The catalog was also made by hand and leans toward Western pop styles. If this system learned from listening history, these gaps would grow into a real filter bubble. A diversity rule, partial credit for related labels and a much bigger catalog would help. See the [Model Card](model_card.md) for the full evaluation and my engineering reflection.
 
 

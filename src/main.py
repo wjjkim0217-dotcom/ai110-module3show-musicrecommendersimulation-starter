@@ -9,7 +9,10 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+try:
+    from src.recommender import load_songs, recommend_songs  # python -m src.main
+except ModuleNotFoundError:
+    from recommender import load_songs, recommend_songs  # python src/main.py
 
 
 # Distinct taste profiles. Keys line up with the scored Song features
