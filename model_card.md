@@ -62,7 +62,7 @@ The catalog is `data/songs.csv`. It has 18 songs.
 
 **Coverage.** There are 15 genres and 14 moods. Lofi has 3 songs. Pop has 2. The other 13 genres have only 1 song each.
 
-**What I changed.** The starter had fewer songs. I added more songs and more genres.
+**What I changed.** The starter catalog had 10 songs. I added 8, each with a new genre and mood: hip hop, country, classical, metal, reggae, r&b, edm and blues.
 
 **What is missing.**
 - The catalog is tiny.
@@ -85,15 +85,11 @@ The catalog is `data/songs.csv`. It has 18 songs.
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
 The biggest weakness I found is that the genre and mood bonuses (up to 2.0 of the 3.67 possible points) can override what the user says about energy, which I saw in the "High Energy + Sad" test profile. That profile asked for energy 0.9 but blues and sad, and the system's top pick was Blue Highway Blues, a slow song with energy 0.40, which scored 2.75 against 1.66 for the best high-energy song. The problem is made worse by the catalog: 13 of 15 genres have only one song, so a rock, jazz or metal fan gets one strong match and then a steep drop to songs that share neither their genre nor their mood, while a lofi fan gets three good matches. Doubling the energy weight and halving the genre weight shrank that blues lead from 1.09 to 0.02, which shows the category weights, not the user's numbers, were deciding the result. In practice this means users with unusual combinations of tastes, or tastes in a small genre, are served worse than users whose tastes match the most common labels.
 
 ---
 
 ## 7. Evaluation  
-
-How you checked whether the recommender behaved as expected. 
 
 **Profiles tested.** I ran ten profiles through `src/main.py` and recorded the top 5 for each (full output is in the README under "Profile Evaluation Output"):
 - Three baseline profiles: High-Energy Pop, Chill Lofi and Deep Intense Rock.

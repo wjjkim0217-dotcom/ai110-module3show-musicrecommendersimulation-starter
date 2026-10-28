@@ -2,15 +2,6 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
 My version is a small, content-based music recommender. It loads an 18-song catalog from a CSV file. A user gives a favorite genre, a favorite mood, and targets for energy and acousticness. The system scores every song, sorts the scores, and shows the top five. Each pick comes with plain-language reasons, such as "mood matches 'happy' (+1.00)". I tested it with ten profiles, including seven built to trick it. The main finding is that the genre and mood bonuses can override what a user asks for in energy. See the [Model Card](model_card.md) for the full evaluation.
 
 ---
@@ -143,13 +134,11 @@ python -m src.main
 
 ### Running Tests
 
-Run the starter tests with:
+Run the 10 tests in `tests/test_recommender.py`, which cover `score_song`, `recommend_songs` and the `Recommender` class:
 
 ```bash
 pytest
 ```
-
-You can add more tests in `tests/test_recommender.py`.
 
 ---
 
@@ -701,15 +690,11 @@ I reviewed `src/recommender.py` and `data/songs.csv` for filter bubbles and bias
 
 Not a problem: every song can reach a top-5 (none are unreachable), and no single song dominates the #1 spot (the most frequent #1, Island Sunday, takes 9% of profiles).
 
-Possible fixes: lower the genre and mood weights or add partial credit through a related-label table, drop or reweight acousticness, add tempo or valence, add an artist/genre diversity penalty to the top-k. You will go deeper on this in your model card.
+Possible fixes: lower the genre and mood weights or add partial credit through a related-label table, drop or reweight acousticness, add tempo or valence, add an artist/genre diversity penalty to the top-k. Section 8 of the [Model Card](model_card.md) lists these as future work.
 
 ---
 
 ## Reflection
-
-Read and complete `model_card.md`:
-
-[**Model Card**](model_card.md)
 
 **How recommenders turn data into predictions.** My recommender turns a user's taste into a score for every song, then shows the top five. Each song earns points for matching the user's genre and mood, and for being close to their energy and acousticness targets. There is no learning. It is only matching and distance. Even so, it felt like a real recommender. Sunrise City came first for a pop fan and Library Rain came first for a lofi fan. The "Why" lines made the picks feel understood. I also learned that the weights matter more than the code. Genre and mood were worth 2.0 points and energy at most 1.17, so a slow blues song beat every loud song for a user who asked for loud music. Halving the genre weight and doubling the energy weight cut that lead from 1.09 to 0.02.
 
