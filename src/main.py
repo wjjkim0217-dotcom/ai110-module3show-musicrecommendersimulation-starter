@@ -13,27 +13,35 @@ from recommender import load_songs, recommend_songs
 
 
 def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    songs = load_songs("data/songs.csv")
+    print(f"Loaded songs: {len(songs)}")
 
-    # Taste profile: a late-night study listener who wants calm, mostly acoustic music.
+    # Default taste profile: an upbeat listener who wants happy, poppy, high-energy,
+    # mostly electronic music.
     # Keys line up with the scored Song features (genre, mood, energy, acousticness).
     user_prefs = {
-        "genre": "lofi",        # exact match against Song.genre
-        "mood": "chill",        # exact match against Song.mood
-        "energy": 0.40,         # closeness to Song.energy (0-1, low = calm)
-        "acousticness": 0.80,   # closeness to Song.acousticness (0-1, high = acoustic)
+        "genre": "pop",         # exact match against Song.genre
+        "mood": "happy",        # exact match against Song.mood
+        "energy": 0.80,         # closeness to Song.energy (0-1, high = energetic)
+        "acousticness": 0.20,   # closeness to Song.acousticness (0-1, low = produced/electronic)
     }
 
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
+    width = 60
+    print()
+    print("=" * width)
+    print(f"{'TOP RECOMMENDATIONS':^{width}}")
+    print("=" * width)
+
+    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+        print(f"\n#{rank}  {song['title']}  by {song['artist']}")
+        print(f"    Score: {score:.2f} / 3.67")
+        print("    Why:")
+        # explanation is the scorer's reasons joined with "; "
+        for reason in explanation.split("; "):
+            print(f"      - {reason}")
+        print("-" * width)
 
 
 if __name__ == "__main__":

@@ -152,18 +152,54 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
+Output for the default profile in `src/main.py` (genre `pop`, mood `happy`, energy `0.80`, acousticness `0.20`), produced by `py src/main.py` from the project root:
 
 ```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
-```
+Loaded songs: 18
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
+============================================================
+                    TOP RECOMMENDATIONS                     
+============================================================
+
+#1  Sunrise City  by Neon Echo
+    Score: 3.64 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - mood matches 'happy' (+1.00)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.49)
+------------------------------------------------------------
+
+#2  Rooftop Lights  by Indigo Parade
+    Score: 2.55 / 3.67
+    Why:
+      - energy is close to your target (+1.12)
+      - mood matches 'happy' (+1.00)
+      - acousticness is close to your target (+0.43)
+------------------------------------------------------------
+
+#3  Gym Hero  by Max Pulse
+    Score: 2.44 / 3.67
+    Why:
+      - energy is close to your target (+1.02)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.42)
+------------------------------------------------------------
+
+#4  Concrete Crown  by Block Theory
+    Score: 1.61 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.46)
+------------------------------------------------------------
+
+#5  Night Drive Loop  by Neon Echo
+    Score: 1.60 / 3.67
+    Why:
+      - energy is close to your target (+1.11)
+      - acousticness is close to your target (+0.49)
+------------------------------------------------------------
+```
 
 ---
 
