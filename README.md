@@ -203,27 +203,501 @@ Loaded songs: 18
 
 ---
 
+## Profile Evaluation Output
+
+Full terminal output of `py src/main.py` for the three baseline profiles and the seven adversarial profiles (`PROFILES` and `ADVERSARIAL_PROFILES` in `src/main.py`), top 5 each.
+
+### High-Energy Pop
+
+Baseline: pop + happy + high energy. Sunrise City matches everything and scores near the 3.67 ceiling.
+
+```
+
+#1  Sunrise City  by Neon Echo
+    Score: 3.62 / 3.67
+    Why:
+      - energy is close to your target (+1.13)
+      - mood matches 'happy' (+1.00)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+
+#2  Gym Hero  by Max Pulse
+    Score: 2.53 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.45)
+------------------------------------------------------------
+
+#3  Rooftop Lights  by Indigo Parade
+    Score: 2.46 / 3.67
+    Why:
+      - energy is close to your target (+1.06)
+      - mood matches 'happy' (+1.00)
+      - acousticness is close to your target (+0.40)
+------------------------------------------------------------
+
+#4  Storm Runner  by Voltline
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.10)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#5  Concrete Crown  by Block Theory
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+```
+
+### Chill Lofi
+
+Baseline: two lofi/chill tracks lead, then partial matches (mood-only, genre-only).
+
+```
+
+#1  Library Rain  by Paper Lanterns
+    Score: 3.58 / 3.67
+    Why:
+      - energy is close to your target (+1.11)
+      - mood matches 'chill' (+1.00)
+      - genre matches 'lofi' (+1.00)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#2  Midnight Coding  by LoRoom
+    Score: 3.48 / 3.67
+    Why:
+      - energy is close to your target (+1.03)
+      - mood matches 'chill' (+1.00)
+      - genre matches 'lofi' (+1.00)
+      - acousticness is close to your target (+0.45)
+------------------------------------------------------------
+
+#3  Spacewalk Thoughts  by Orbit Bloom
+    Score: 2.59 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - mood matches 'chill' (+1.00)
+      - acousticness is close to your target (+0.44)
+------------------------------------------------------------
+
+#4  Focus Flow  by LoRoom
+    Score: 2.54 / 3.67
+    Why:
+      - energy is close to your target (+1.05)
+      - genre matches 'lofi' (+1.00)
+      - acousticness is close to your target (+0.49)
+------------------------------------------------------------
+
+#5  Coffee Shop Stories  by Slow Stereo
+    Score: 1.54 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.46)
+------------------------------------------------------------
+```
+
+### Deep Intense Rock
+
+Baseline: Storm Runner is the only rock song; Gym Hero follows on the intense mood alone.
+
+```
+
+#1  Storm Runner  by Voltline
+    Score: 3.66 / 3.67
+    Why:
+      - energy is close to your target (+1.16)
+      - mood matches 'intense' (+1.00)
+      - genre matches 'rock' (+1.00)
+      - acousticness is close to your target (+0.50)
+------------------------------------------------------------
+
+#2  Gym Hero  by Max Pulse
+    Score: 2.63 / 3.67
+    Why:
+      - energy is close to your target (+1.16)
+      - mood matches 'intense' (+1.00)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#3  Pulse Cathedral  by Helix Drop
+    Score: 1.60 / 3.67
+    Why:
+      - energy is close to your target (+1.13)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#4  Iron Requiem  by Grave Engine
+    Score: 1.58 / 3.67
+    Why:
+      - energy is close to your target (+1.11)
+      - acousticness is close to your target (+0.46)
+------------------------------------------------------------
+
+#5  Sunrise City  by Neon Echo
+    Score: 1.51 / 3.67
+    Why:
+      - energy is close to your target (+1.05)
+      - acousticness is close to your target (+0.46)
+------------------------------------------------------------
+```
+
+### Conflict: High Energy + Sad
+
+Adversarial: wants energy 0.9 but blues/sad. The slow Blue Highway Blues (energy 0.40) still wins because genre + mood give 2.0 points versus at most 1.17 for energy.
+
+```
+
+#1  Blue Highway Blues  by Delta Mercy
+    Score: 2.75 / 3.67
+    Why:
+      - energy is close to your target (+0.58)
+      - mood matches 'sad' (+1.00)
+      - genre matches 'blues' (+1.00)
+      - acousticness is close to your target (+0.17)
+------------------------------------------------------------
+
+#2  Storm Runner  by Voltline
+    Score: 1.66 / 3.67
+    Why:
+      - energy is close to your target (+1.16)
+      - acousticness is close to your target (+0.50)
+------------------------------------------------------------
+
+#3  Gym Hero  by Max Pulse
+    Score: 1.61 / 3.67
+    Why:
+      - energy is close to your target (+1.13)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#4  Pulse Cathedral  by Helix Drop
+    Score: 1.58 / 3.67
+    Why:
+      - energy is close to your target (+1.11)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#5  Iron Requiem  by Grave Engine
+    Score: 1.55 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.46)
+------------------------------------------------------------
+```
+
+### Split: Pop Genre + Sad Mood
+
+Adversarial: genre and mood point to different songs. The mood match (Blue Highway Blues) edges out the genre match (Sunrise City) on the numeric terms.
+
+```
+
+#1  Blue Highway Blues  by Delta Mercy
+    Score: 2.42 / 3.67
+    Why:
+      - energy is close to your target (+1.05)
+      - mood matches 'sad' (+1.00)
+      - acousticness is close to your target (+0.37)
+------------------------------------------------------------
+
+#2  Sunrise City  by Neon Echo
+    Score: 2.14 / 3.67
+    Why:
+      - energy is close to your target (+0.80)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.34)
+------------------------------------------------------------
+
+#3  Gym Hero  by Max Pulse
+    Score: 1.94 / 3.67
+    Why:
+      - energy is close to your target (+0.67)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.28)
+------------------------------------------------------------
+
+#4  Velvet Hours  by Maya Lune
+    Score: 1.59 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.44)
+------------------------------------------------------------
+
+#5  Island Sunday  by Sol Tide
+    Score: 1.55 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+```
+
+### Impossible: Energetic + Acoustic
+
+Adversarial: no song is both high-energy and acoustic. Storm Runner wins on categories; the 0.95 acousticness request earns only +0.08.
+
+```
+
+#1  Storm Runner  by Voltline
+    Score: 3.20 / 3.67
+    Why:
+      - energy is close to your target (+1.12)
+      - mood matches 'intense' (+1.00)
+      - genre matches 'rock' (+1.00)
+      - acousticness is close to your target (+0.08)
+------------------------------------------------------------
+
+#2  Gym Hero  by Max Pulse
+    Score: 2.20 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - mood matches 'intense' (+1.00)
+      - acousticness is close to your target (+0.05)
+------------------------------------------------------------
+
+#3  Pulse Cathedral  by Helix Drop
+    Score: 1.21 / 3.67
+    Why:
+      - energy is close to your target (+1.17)
+      - acousticness is close to your target (+0.05)
+------------------------------------------------------------
+
+#4  Iron Requiem  by Grave Engine
+    Score: 1.19 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.04)
+------------------------------------------------------------
+
+#5  Rooftop Lights  by Indigo Parade
+    Score: 1.15 / 3.67
+    Why:
+      - energy is close to your target (+0.95)
+      - acousticness is close to your target (+0.20)
+------------------------------------------------------------
+```
+
+### Unknown Genre/Mood
+
+Adversarial: labels absent from the catalog. Only numeric terms score, so the top score is just 1.62 and nothing warns the user.
+
+```
+
+#1  Island Sunday  by Sol Tide
+    Score: 1.62 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#2  Velvet Hours  by Maya Lune
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - acousticness is close to your target (+0.49)
+------------------------------------------------------------
+
+#3  Rooftop Lights  by Indigo Parade
+    Score: 1.46 / 3.67
+    Why:
+      - energy is close to your target (+0.98)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#4  Night Drive Loop  by Neon Echo
+    Score: 1.40 / 3.67
+    Why:
+      - energy is close to your target (+0.99)
+      - acousticness is close to your target (+0.41)
+------------------------------------------------------------
+
+#5  Dusty Porch Light  by Hollow Creek
+    Score: 1.32 / 3.67
+    Why:
+      - energy is close to your target (+1.03)
+      - acousticness is close to your target (+0.29)
+------------------------------------------------------------
+```
+
+### Case Mismatch: 'Pop'/'HAPPY'
+
+Adversarial: same intent as High-Energy Pop, but capitalised. Labels are now normalised (lowercased and trimmed) before comparing, so this matches the High-Energy Pop output exactly. Before the fix, exact string matching awarded no category points and the top score was 1.62.
+
+```
+
+#1  Sunrise City  by Neon Echo
+    Score: 3.62 / 3.67
+    Why:
+      - energy is close to your target (+1.13)
+      - mood matches 'happy' (+1.00)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+
+#2  Gym Hero  by Max Pulse
+    Score: 2.53 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - genre matches 'pop' (+1.00)
+      - acousticness is close to your target (+0.45)
+------------------------------------------------------------
+
+#3  Rooftop Lights  by Indigo Parade
+    Score: 2.46 / 3.67
+    Why:
+      - energy is close to your target (+1.06)
+      - mood matches 'happy' (+1.00)
+      - acousticness is close to your target (+0.40)
+------------------------------------------------------------
+
+#4  Storm Runner  by Voltline
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.10)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#5  Concrete Crown  by Block Theory
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+```
+
+### Out of Range: energy 2.0
+
+Adversarial: energy outside 0-1 is now clamped to 1.0, so the energy term stays between 0 and 1.17 and scores remain meaningful. Before the fix the energy term went negative (+-0.06) and the top score was 2.42.
+
+```
+
+#1  Pulse Cathedral  by Helix Drop
+    Score: 3.59 / 3.67
+    Why:
+      - energy is close to your target (+1.11)
+      - mood matches 'euphoric' (+1.00)
+      - genre matches 'edm' (+1.00)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+
+#2  Iron Requiem  by Grave Engine
+    Score: 1.62 / 3.67
+    Why:
+      - energy is close to your target (+1.13)
+      - acousticness is close to your target (+0.48)
+------------------------------------------------------------
+
+#3  Gym Hero  by Max Pulse
+    Score: 1.56 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#4  Storm Runner  by Voltline
+    Score: 1.51 / 3.67
+    Why:
+      - energy is close to your target (+1.06)
+      - acousticness is close to your target (+0.45)
+------------------------------------------------------------
+
+#5  Sunrise City  by Neon Echo
+    Score: 1.37 / 3.67
+    Why:
+      - energy is close to your target (+0.96)
+      - acousticness is close to your target (+0.41)
+------------------------------------------------------------
+```
+
+### Neutral: All 0.5
+
+Adversarial: no category match and mid-range numerics. The top five are within 0.17 of each other, so the ranking is close to arbitrary.
+
+```
+
+#1  Velvet Hours  by Maya Lune
+    Score: 1.59 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.44)
+------------------------------------------------------------
+
+#2  Island Sunday  by Sol Tide
+    Score: 1.55 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#3  Dusty Porch Light  by Hollow Creek
+    Score: 1.49 / 3.67
+    Why:
+      - energy is close to your target (+1.15)
+      - acousticness is close to your target (+0.34)
+------------------------------------------------------------
+
+#4  Midnight Coding  by LoRoom
+    Score: 1.47 / 3.67
+    Why:
+      - energy is close to your target (+1.08)
+      - acousticness is close to your target (+0.40)
+------------------------------------------------------------
+
+#5  Blue Highway Blues  by Delta Mercy
+    Score: 1.42 / 3.67
+    Why:
+      - energy is close to your target (+1.05)
+      - acousticness is close to your target (+0.37)
+------------------------------------------------------------
+```
+
+---
+
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+### Weight shift: double energy, halve genre
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+**Change:** energy weight `1.17` → `2.34`, genre weight `1.0` → `0.5`. Mood (`1.0`) and acousticness (`0.5`) stayed the same. I ran this on a scratch copy of `score_song`, so `src/recommender.py` still uses the original weights. Max possible score becomes 4.34.
+
+The #1 song stayed the same for all ten profiles. The rest of the ranking moved in the profiles below:
+
+| Profile | Original top 3 | Shifted top 3 | What changed |
+|---|---|---|---|
+| High-Energy Pop | Sunrise City 3.62, Gym Hero 2.53, Rooftop Lights 2.46 | Sunrise City 4.25, Rooftop Lights 3.53, Gym Hero 3.10 | #2 and #3 swap. Gym Hero's genre match is now worth half as much, so Rooftop Lights' mood match wins. |
+| Deep Intense Rock | Storm Runner 3.66, Gym Hero 2.63, Pulse Cathedral 1.60 | Storm Runner 4.32, Gym Hero 3.79, Pulse Cathedral 2.74 | The order is unchanged, but the gap between #2 and #3 shrinks from 1.03 to 1.05 only in absolute terms. Relative to the top score it stays similar. |
+| Conflict: High Energy + Sad | Blue Highway Blues 2.75, Storm Runner 1.66, Gym Hero 1.61 | Blue Highway Blues 2.84, Storm Runner 2.82, Gym Hero 2.74 | The sad blues song still wins, but its lead over Storm Runner falls from 1.09 to 0.02. It is now close to a tie. |
+| Split: Pop Genre + Sad Mood | Blue Highway Blues 2.42, Sunrise City 2.14, Gym Hero 1.94 | Blue Highway Blues 3.48, Velvet Hours 2.73, Dusty Porch Light 2.63 | Both pop songs fall out of the top 3. Genre is now worth only 0.5, so mid-energy songs with no category match outrank them. |
+| Out of Range: energy 2.0 (measured before input clamping was added) | Pulse Cathedral 2.42, Iron Requiem 0.45 | Pulse Cathedral 1.86, Iron Requiem 0.41 | Doubling the energy weight made the out-of-range energy penalty worse (Sunrise City went to -0.01). Input clamping has since removed this problem. |
+
+**Takeaways:**
+- The system is sensitive to this change in the cases where categories and numbers disagree. The conflicting-preference profile went from an overwhelming genre/mood win to a near tie, which is closer to what the user's energy request implies.
+- Profiles where one song matches everything (Chill Lofi, Deep Intense Rock) are robust: the #1 song stays the same.
+- Halving genre makes genre almost irrelevant when it is the only match. In "Split: Pop Genre + Sad Mood", two pop songs dropped out of the top 5 entirely, so genre-loyal users would likely be less happy.
+- Doubling energy did not fix the unvalidated-input problem; it amplified it. That problem is now fixed separately by clamping inputs to 0-1 in `score_song`.
+
+Other experiments still to try: adding tempo or valence to the score, and clamping or lowercasing inputs.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+I reviewed `src/recommender.py` and `data/songs.csv` for filter bubbles and bias, and checked each suspicion with a script (3,780 generated profiles covering every catalog genre and mood across six energy targets and three acousticness targets). Findings, most serious first:
 
-Examples:
+1. **Uneven service by genre.** 13 of 15 genres and 11 of 14 moods have exactly one song. A lofi fan gets four strong matches (all above 2.5), but a rock, jazz or metal fan gets one strong match and then a steep drop (rock: 3.47, then 2.42, then 1.42). The second pick for a jazz or metal fan shares neither genre nor mood with them. Users of well-represented genres get a much fuller experience.
+2. **Categories are all-or-nothing.** Genre and mood are exact string matches worth up to 2.0 of 3.67 points, and related labels get no partial credit: `pop` vs `indie pop`, `sad` vs `melancholic`, `chill` vs `relaxed`. Only 17 of the 210 possible genre+mood pairs exist in the catalog, so most combinations of tastes can never score above 2.67 (one category match plus perfect numeric closeness). There is also no diversity rule, so the top 5 can repeat an artist (Neon Echo and LoRoom each appear twice).
+3. **Energy and acousticness are the same signal.** In the catalog, energy and acousticness correlate at r = -0.97. Acousticness adds almost nothing beyond energy, and a user who wants both high energy and high acousticness (acoustic rock, unplugged sets) cannot be served: the energy term wins, and the acoustic request earns only +0.08 (see "Impossible: Energetic + Acoustic").
+4. **The energy gap is symmetric and favors the middle of the catalog.** The gap is fair in direction, but the catalog is not: only 4 of 18 songs have energy below 0.4 and none lies between 0.58 and 0.75. With no category match, a user targeting energy 0.6 gets a best score of 1.62 and one targeting 0.0 gets 1.19, so very low-energy users (sleep, ambient) are served worst. A single target number also cannot express a range, such as someone who likes both calm and intense music.
+5. **Tempo, valence and danceability are ignored.** Two songs with identical energy and acousticness but very different feel look the same. For example, a user who wants sad but danceable music cannot say so.
+6. **No feedback loop yet, so no true filter bubble.** The recommender is stateless: it does not learn from what a user plays, so it cannot narrow their taste over time. If it were extended with listening history, the all-or-nothing genre bonus and the missing diversity rule (points 1 and 2) would make that feedback loop narrow quickly.
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
+Fixed since this review: brittle inputs. `score_song` now lowercases and trims genre/mood labels, clamps energy and acousticness targets to 0-1, and skips a term when a preference is missing or not a number, instead of raising a `KeyError`.
 
-You will go deeper on this in your model card.
+Not a problem: every song can reach a top-5 (none are unreachable), and no single song dominates the #1 spot (the most frequent #1, Island Sunday, takes 9% of profiles).
+
+Possible fixes: lower the genre and mood weights or add partial credit through a related-label table, drop or reweight acousticness, add tempo or valence, add an artist/genre diversity penalty to the top-k. You will go deeper on this in your model card.
 
 ---
 

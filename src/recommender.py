@@ -61,26 +61,47 @@ def load_songs(csv_path: str) -> List[Dict]:
             songs.append(row)
     return songs
 
+def _clean_label(value) -> str:
+    """Normalize a genre/mood label so 'Pop ' and 'pop' compare equal."""
+    return str(value).strip().lower() if value is not None else ""
+
+def _clamp01(value) -> Optional[float]:
+    """Clamp a numeric preference to 0-1; return None if it is missing or not a number."""
+    try:
+        return min(1.0, max(0.0, float(value)))
+    except (TypeError, ValueError):
+        return None
+
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """Score one song against user preferences, returning (score, reasons)."""
+    """Score one song against user preferences, returning (score, reasons).
+
+    Preferences are forgiving: labels are case/whitespace-insensitive, numeric targets
+    are clamped to 0-1, and a missing preference simply earns no points for that term.
+    """
     score = 0.0
     reasons: List[str] = []
 
-    energy_points = 1.17 * (1 - abs(user_prefs["energy"] - song["energy"]))
-    score += energy_points
-    reasons.append(f"energy is close to your target (+{energy_points:.2f})")
+    energy_target = _clamp01(user_prefs.get("energy"))
+    if energy_target is not None:
+        energy_points = 1.17 * (1 - abs(energy_target - song["energy"]))
+        score += energy_points
+        reasons.append(f"energy is close to your target (+{energy_points:.2f})")
 
-    if song["mood"] == user_prefs["mood"]:
+    mood = _clean_label(user_prefs.get("mood"))
+    if mood and _clean_label(song["mood"]) == mood:
         score += 1.0
         reasons.append(f"mood matches '{song['mood']}' (+1.00)")
 
-    if song["genre"] == user_prefs["genre"]:
+    genre = _clean_label(user_prefs.get("genre"))
+    if genre and _clean_label(song["genre"]) == genre:
         score += 1.0
         reasons.append(f"genre matches '{song['genre']}' (+1.00)")
 
-    acoustic_points = 0.5 * (1 - abs(user_prefs["acousticness"] - song["acousticness"]))
-    score += acoustic_points
-    reasons.append(f"acousticness is close to your target (+{acoustic_points:.2f})")
+    acoustic_target = _clamp01(user_prefs.get("acousticness"))
+    if acoustic_target is not None:
+        acoustic_points = 0.5 * (1 - abs(acoustic_target - song["acousticness"]))
+        score += acoustic_points
+        reasons.append(f"acousticness is close to your target (+{acoustic_points:.2f})")
 
     return score, reasons
 
