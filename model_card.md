@@ -2,20 +2,26 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeScorecard 1.0**
 
 ---
 
-## 2. Intended Use  
+## 2. Goal and Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+**Goal.** The model suggests five songs from a small catalog that fit a user's taste. It guesses which songs a user would like best.
 
-Prompts:  
+**Intended use.**
+- Classroom exploration of how a simple recommender works.
+- Learning how scoring rules turn taste into a ranked list.
+- Showing the reasons behind each pick.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+**What it assumes about the user.** The user can name one favorite genre and one favorite mood. The user can also give a target for energy and acousticness, each from 0 to 1.
+
+**Not intended for.**
+- Real music apps or real users.
+- Judging an artist or song as good or bad.
+- Making any decision that affects people, like pay or promotion.
+- Users with niche or mixed tastes. It handles them poorly (see Section 6).
 
 ---
 
@@ -50,26 +56,30 @@ The points are added up to give the song's final score.
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+The catalog is `data/songs.csv`. It has 18 songs.
 
-Prompts:  
+**Features.** Each song has a title, artist, genre, mood, energy, tempo, valence, danceability and acousticness. The scorer only uses genre, mood, energy and acousticness.
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+**Coverage.** There are 15 genres and 14 moods. Lofi has 4 songs. Pop has 2. The other 13 genres have only 1 song each.
+
+**What I changed.** The starter had fewer songs. I added more songs and more genres.
+
+**What is missing.**
+- The catalog is tiny.
+- There are no lyrics, languages, years or artist popularity.
+- Most genres are Western pop styles. Many world genres are absent.
+- Energy and acousticness move together (r = -0.97), so they carry nearly the same signal.
+- The values were set by hand, not measured from real audio or listeners.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+- It works well for users whose taste matches common labels, like pop, lofi and rock.
+- Baseline profiles got the pick I expected. Scores were 3.58 to 3.66 out of 3.67.
+- Opposite users get opposite lists. Chill Lofi and High-Energy Pop share no songs.
+- Every pick comes with reasons, so it is easy to see why a song ranked high.
+- Messy input like "Pop" or "HAPPY" no longer breaks it.
 
 ---
 
@@ -123,23 +133,37 @@ Across all ten, the output moves the way the preferences say it should in the nu
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+1. **Rebalance the weights.** Give energy more weight and genre less. Then a genre or mood label can't override what the user asked for.
+2. **Add more songs.** Get several songs per genre. Then small genres stop dropping off a cliff after one match.
+3. **Support mixed tastes.** Let users pick several genres or moods. Add valence and tempo too.
+4. **Mix up the top five.** Avoid five near-identical songs in one list.
+5. **Warn on unknown input.** Tell the user when a genre like "k-pop" matches nothing.
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+**Biggest learning moment.** Weights decide everything. The scorer looked fine on normal profiles. Then I ran "High Energy + Sad". A slow blues song (energy 0.40) beat every loud song, even though the user asked for energy 0.9. Genre and mood were worth 2.0 points. Energy was worth at most 1.17. I had picked those numbers early and never questioned them. Halving the genre weight and doubling the energy weight fixed the gap. So the lesson is simple. Test the weird cases, not just the happy path.
 
-Prompts:  
+**How AI helped.** I used an AI assistant to:
+- Draft the scoring and ranking code.
+- Generate the adversarial profiles.
+- Run the profile comparisons.
+- Write up the results.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+It was fast and it gave me a lot to look at. That made it easy to see patterns, like the 3,780 generated profiles.
+
+**When I had to double-check it.**
+- Numbers in the write-up. Scores, ranks and correlations (like r = -0.97) need to match the real output. I re-ran them.
+- Tests. The pytest suite was not run, and it does not test `score_song`. A passing story is not a passing test.
+- Bugs it only found after I probed. "Pop" and "pop" scored differently. Energy 2.0 gave a negative score. An empty profile crashed. The first draft of the code did not handle any of these.
+- Explanations. The AI can sound sure about why a result happened. I checked by changing one weight and watching the output.
+
+**What surprised me.** A scorecard with four lines still felt like a real recommender. Sunrise City came up first for a pop fan. Library Rain came up first for a lofi fan. The "Why" lines made it feel even smarter. But there is no learning in it. It is only distance and matching labels. The feeling of being understood comes from the explanation and from a good first match. It also hides how thin the catalog is. Most genres have one song, so the "recommendation" is often just the only choice.
+
+**What I would try next.**
+- Rebalance the weights and compare results again.
+- Grow the catalog to several songs per genre.
+- Let users pick more than one genre or mood.
+- Use valence and tempo.
+- Ask a few real people to rate the top five. Then I would learn if the scores match what people like, not just what I expect.

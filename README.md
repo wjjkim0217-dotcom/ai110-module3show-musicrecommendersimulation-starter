@@ -678,7 +678,7 @@ The #1 song stayed the same for all ten profiles. The rest of the ranking moved 
 - Halving genre makes genre almost irrelevant when it is the only match. In "Split: Pop Genre + Sad Mood", two pop songs dropped out of the top 5 entirely, so genre-loyal users would likely be less happy.
 - Doubling energy did not fix the unvalidated-input problem; it amplified it. That problem is now fixed separately by clamping inputs to 0-1 in `score_song`.
 
-Other experiments still to try: adding tempo or valence to the score, and clamping or lowercasing inputs.
+Other experiment still to try: adding tempo or valence to the score. (Clamping and lowercasing inputs are already done in `score_song`.)
 
 ---
 
@@ -693,7 +693,6 @@ I reviewed `src/recommender.py` and `data/songs.csv` for filter bubbles and bias
 5. **Tempo, valence and danceability are ignored.** Two songs with identical energy and acousticness but very different feel look the same. For example, a user who wants sad but danceable music cannot say so.
 6. **No feedback loop yet, so no true filter bubble.** The recommender is stateless: it does not learn from what a user plays, so it cannot narrow their taste over time. If it were extended with listening history, the all-or-nothing genre bonus and the missing diversity rule (points 1 and 2) would make that feedback loop narrow quickly.
 
-Fixed since this review: brittle inputs. `score_song` now lowercases and trims genre/mood labels, clamps energy and acousticness targets to 0-1, and skips a term when a preference is missing or not a number, instead of raising a `KeyError`.
 
 Not a problem: every song can reach a top-5 (none are unreachable), and no single song dominates the #1 spot (the most frequent #1, Island Sunday, takes 9% of profiles).
 
@@ -707,10 +706,8 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+**How recommenders turn data into predictions.** My recommender turns a user's taste into a score for every song, then shows the top five. Each song earns points for matching the user's genre and mood, and for being close to their energy and acousticness targets. There is no learning. It is only matching and distance. Even so, it felt like a real recommender. Sunrise City came first for a pop fan and Library Rain came first for a lofi fan. The "Why" lines made the picks feel understood. I also learned that the weights matter more than the code. Genre and mood were worth 2.0 points and energy at most 1.17, so a slow blues song beat every loud song for a user who asked for loud music. Halving the genre weight and doubling the energy weight cut that lead from 1.09 to 0.02.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
+**Where bias or unfairness could show up.** The biggest problem is the data. 13 of 15 genres have only one song. A lofi fan gets four good matches, but a rock, jazz or metal fan gets one and then a steep drop. Users with common tastes are served better than users with niche or mixed tastes. Exact-match labels make it worse, because "pop" gets no credit for "indie pop". The catalog was also made by hand and leans toward Western pop styles. If this system learned from listening history, these gaps would grow into a real filter bubble. A diversity rule, partial credit for related labels and a much bigger catalog would help. See the [Model Card](model_card.md) for the full evaluation and my engineering reflection.
 
 
