@@ -46,11 +46,11 @@ The points are added up to give the song's final score.
 
 **Picking the winners.** The judge scores every song, sorts them from highest to lowest, and shows the top five. If two songs tie, the one that appears first in the catalog goes first. Each recommendation also comes with the reasons behind its score, such as "mood matches 'happy' (+1.00)", so you can see why it was picked.
 
-**A worked example.** For someone who wants pop, happy, high-energy, low-acoustic music, "Sunrise City" (pop, happy, energetic, not very acoustic) scores about 3.64. It earns nearly full points on all four lines. "Gym Hero" (pop, but an intense mood) scores about 2.44. It gets the genre point but misses the mood point.
+**A worked example.** For the High-Energy Pop profile (pop, happy, energy 0.85, acousticness 0.15), "Sunrise City" (pop, happy, energetic, not very acoustic) scores about 3.62. It earns nearly full points on all four lines. "Gym Hero" (pop, but an intense mood) scores about 2.53. It gets the genre point but misses the mood point.
 
 **What this means in practice.** Genre and mood together are worth 2 of the roughly 3.67 points, so the labels count for more than how a song actually sounds. A song with the right labels but the wrong feel can beat a song that sounds right but has different labels.
 
-**Changes from the starter.** The starter code only had empty placeholders for loading songs, scoring them and ranking them. I wrote all three: reading the catalog from the spreadsheet file, the four-line scorecard above, and the sort-and-pick-the-top-five step. I also made the output show the reasons next to each score.
+**Changes from the starter.** The starter code only had empty placeholders for loading songs, scoring them and ranking them. I wrote all three: reading the catalog from the spreadsheet file, the four-line scorecard above, and the sort-and-pick-the-top-five step. I also made the output show the reasons next to each score, and filled in the starter's `Recommender` class so its `recommend` and `explain_recommendation` methods use the same scorecard.
 
 ---
 
@@ -127,7 +127,7 @@ How you checked whether the recommender behaved as expected.
 
 Across all ten, the output moves the way the preferences say it should in the numeric terms (pairs 1, 3, 9 and 10) and in the genre and mood matches (pair 2). The invalid results come from places where those terms disagree with each other (pairs 4, 7 and 8) or where the input is not recognised (pairs 5 and 6).
 
-**Limits of this evaluation.** The catalog has only 18 songs and I tested by reading results, not with a held-out set of real listeners, so these checks show how the scoring behaves and not whether real users would be happy. The pytest suite (8 tests, all passing) checks `score_song` and `recommend_songs` on small hand-made cases, but it does not replace testing with real listeners.
+**Limits of this evaluation.** The catalog has only 18 songs and I tested by reading results, not with a held-out set of real listeners, so these checks show how the scoring behaves and not whether real users would be happy. The pytest suite (10 tests, all passing) checks `score_song`, `recommend_songs` and the `Recommender` class on small hand-made cases, but it does not replace testing with real listeners.
 
 ---
 
@@ -155,7 +155,7 @@ It was fast and it gave me a lot to look at. That made it easy to see patterns, 
 
 **When I had to double-check it.**
 - Numbers in the write-up. Scores, ranks and correlations (like r = -0.97) need to match the real output. I re-ran them.
-- Tests. The starter tests did not cover `score_song`, so I added tests for it and for `recommend_songs`. A passing story is not a passing test.
+- Tests. The starter tests did not cover `score_song`, so I added tests for it and for `recommend_songs`. The starter `Recommender` tests also passed against placeholder code, only because the pop song happened to be first in the list, so I added tests that rank by score and check the explanation text. A passing story is not a passing test.
 - Bugs it only found after I probed. "Pop" and "pop" scored differently. Energy 2.0 gave a negative score. An empty profile crashed. The first draft of the code did not handle any of these.
 - Explanations. The AI can sound sure about why a result happened. I checked by changing one weight and watching the output.
 

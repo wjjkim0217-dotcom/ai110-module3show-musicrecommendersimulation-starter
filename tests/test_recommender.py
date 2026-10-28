@@ -61,6 +61,38 @@ def test_explain_recommendation_returns_non_empty_string():
     assert explanation.strip() != ""
 
 
+def test_recommend_ranks_by_score_not_catalog_order():
+    user = UserProfile(
+        favorite_genre="lofi",
+        favorite_mood="chill",
+        target_energy=0.4,
+        likes_acoustic=True,
+    )
+    rec = make_small_recommender()  # pop song comes first in the catalog
+    results = rec.recommend(user, k=2)
+
+    assert results[0].genre == "lofi"
+    assert results[1].genre == "pop"
+
+
+def test_explain_recommendation_reflects_scoring():
+    user = UserProfile(
+        favorite_genre="pop",
+        favorite_mood="happy",
+        target_energy=0.8,
+        likes_acoustic=False,
+    )
+    rec = make_small_recommender()
+
+    match = rec.explain_recommendation(user, rec.songs[0])
+    assert "genre matches 'pop'" in match
+    assert "mood matches 'happy'" in match
+
+    mismatch = rec.explain_recommendation(user, rec.songs[1])
+    assert "genre matches" not in mismatch
+    assert "mood matches" not in mismatch
+
+
 # --- Tests for the functional scoring and ranking API ---
 
 from src.recommender import score_song, recommend_songs

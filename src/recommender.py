@@ -1,6 +1,6 @@
 import csv
 from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 @dataclass
 class Song:
@@ -39,12 +39,27 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        """Return the top k songs for this user, best first, using score_song."""
+        prefs = _profile_to_prefs(user)
+        # sorted() is stable, so tied scores keep catalog order.
+        return sorted(self.songs, key=lambda song: score_song(prefs, asdict(song))[0], reverse=True)[:k]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        """Explain a song's score for this user as the scorer's reasons joined with '; '."""
+        _, reasons = score_song(_profile_to_prefs(user), asdict(song))
+        return "; ".join(reasons) if reasons else "no preferences matched this song"
+
+def _profile_to_prefs(user: UserProfile) -> Dict:
+    """Convert a UserProfile into the prefs dict score_song expects.
+
+    likes_acoustic becomes an acousticness target: 1.0 if True, 0.0 if False.
+    """
+    return {
+        "genre": user.favorite_genre,
+        "mood": user.favorite_mood,
+        "energy": user.target_energy,
+        "acousticness": 1.0 if user.likes_acoustic else 0.0,
+    }
 
 def load_songs(csv_path: str) -> List[Dict]:
     """Load songs from a CSV file as dicts, converting id to int and numeric features to float."""

@@ -25,8 +25,8 @@ Each `Song` has ten fields, loaded from `data/songs.csv`:
 
 - **Identity (not scored):** `id`, `title`, `artist`
 - **Categorical (scored by exact match):** `genre`, `mood`
-- **Numeric, 0–1 (scored by closeness):** `energy`, `acousticness`, `valence`
-- **Stored but not scored:** `tempo_bpm`, `danceability`. Both largely repeat what `energy` already captures, and tempo would need rescaling.
+- **Numeric, 0–1 (scored by closeness):** `energy`, `acousticness`
+- **Stored but not scored:** `tempo_bpm`, `danceability`, `valence`. Tempo and danceability largely repeat what `energy` already captures (and tempo would need rescaling); valence has no matching user preference yet.
 
 ### What information does the `UserProfile` store?
 
@@ -37,15 +37,17 @@ Each `Song` has ten fields, loaded from `data/songs.csv`:
 
 The profile has no valence target, so `Song.valence` is kept as data but is not part of the score yet.
 
-The taste profile used for comparisons (in `src/main.py`) is a late-night study listener:
+`Recommender.recommend` and `Recommender.explain_recommendation` take a `UserProfile`, convert it to a preferences dict, and call the same `score_song` used everywhere else. `src/main.py` uses the functional API (`recommend_songs`) with plain dicts, which take an acousticness number directly instead of a true/false flag.
+
+`src/main.py` defines three baseline profiles (`PROFILES`) and seven adversarial ones (`ADVERSARIAL_PROFILES`). For example, the late-night study listener:
 
 ```python
-user_prefs = {
+"Chill Lofi": {
     "genre": "lofi",        # exact match against Song.genre
     "mood": "chill",        # exact match against Song.mood
-    "energy": 0.40,         # closeness to Song.energy (low = calm)
+    "energy": 0.30,         # closeness to Song.energy (low = calm)
     "acousticness": 0.80,   # closeness to Song.acousticness (high = acoustic)
-}
+},
 ```
 
 ### How does the `Recommender` compute a score for each song?
@@ -104,13 +106,13 @@ OUTPUT    sort by score (highest first) -> top k as (song, score, explanation)
 
 ### Potential Biases
 
-- **Labels outweigh sound.** Mood and genre together are worth 2 of about 3.67 points (54%). A song that matches both labels but is far from the target energy and acousticness can still outrank a song that matches the sound exactly. For the lofi/chill profile, Focus Flow (lofi, `focused`) already ranks above Spacewalk Thoughts (ambient, `chill`), even though a chill listener may prefer the second.
+- **Labels outweigh sound.** Mood and genre together are worth 2 of about 3.67 points (54%). A song that matches both labels but is far from the target energy and acousticness can still outrank a song that matches the sound exactly. For the "Conflict: High Energy + Sad" profile (energy 0.90), Blue Highway Blues (energy 0.40) scores 2.75 and beats Storm Runner (energy 0.91) at 1.66. For Chill Lofi, Focus Flow (2.54) and Coffee Shop Stories (1.54) are about equally close in sound, but Focus Flow's lofi label puts it a full point ahead.
 - **Exact-match genre is all-or-nothing.** "Indie pop" gets no credit against "pop", and "ambient" gets none against "lofi", even though they are close. Great songs in a neighboring genre are penalized.
 - **The catalog is uneven.** Lofi has 3 songs and every other genre has 1 or 2, so a lofi listener gets more genre bonuses than anyone else. For most other users only one song can earn the genre bonus, and the rest of the list is decided by energy and acousticness.
 - **Energy and acousticness overlap.** In this data they are almost mirror images, so the two terms partly double count the same "calm and acoustic vs loud and electronic" preference.
-- **Valence is ignored.** A sad song and a happy song with similar energy look alike to the scorer. Blue Highway Blues (blues, `sad`) ranks fifth for the chill lofi profile mostly on energy and acousticness.
+- **Valence is ignored.** A sad song and a happy song with similar energy look alike to the scorer. Blue Highway Blues (blues, `sad`) scores 1.53 for the Chill Lofi profile on energy and acousticness alone, only 0.01 behind the #5 pick.
 - **One genre and one mood per user.** A listener who likes both lofi and jazz, or both chill and relaxed, cannot say so.
-- **No diversity.** Near-identical songs such as Midnight Coding and Library Rain (scores within 0.02) will appear side by side.
+- **No diversity.** Near-identical songs appear side by side: Library Rain and Midnight Coding (both lofi and `chill`) take #1 and #2 for Chill Lofi, 0.10 apart.
 - **Stated tastes only.** There is no listening history or feedback, so the system cannot learn that a user's real taste differs from what they typed.
 
 ---
@@ -153,60 +155,62 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Output for the default profile in `src/main.py` (genre `pop`, mood `happy`, energy `0.80`, acousticness `0.20`), produced by `py src/main.py` from the project root:
+The start of the output from `python -m src.main` (run from the project root), showing the first profile, High-Energy Pop (genre `pop`, mood `happy`, energy `0.85`, acousticness `0.15`):
 
 ```
 Loaded songs: 18
 
 ============================================================
-                    TOP RECOMMENDATIONS                     
+            TOP RECOMMENDATIONS: High-Energy Pop            
 ============================================================
 
 #1  Sunrise City  by Neon Echo
-    Score: 3.64 / 3.67
+    Score: 3.62 / 3.67
     Why:
-      - energy is close to your target (+1.15)
+      - energy is close to your target (+1.13)
       - mood matches 'happy' (+1.00)
       - genre matches 'pop' (+1.00)
-      - acousticness is close to your target (+0.49)
+      - acousticness is close to your target (+0.48)
 ------------------------------------------------------------
 
-#2  Rooftop Lights  by Indigo Parade
-    Score: 2.55 / 3.67
+#2  Gym Hero  by Max Pulse
+    Score: 2.53 / 3.67
     Why:
-      - energy is close to your target (+1.12)
-      - mood matches 'happy' (+1.00)
-      - acousticness is close to your target (+0.43)
-------------------------------------------------------------
-
-#3  Gym Hero  by Max Pulse
-    Score: 2.44 / 3.67
-    Why:
-      - energy is close to your target (+1.02)
+      - energy is close to your target (+1.08)
       - genre matches 'pop' (+1.00)
-      - acousticness is close to your target (+0.42)
+      - acousticness is close to your target (+0.45)
 ------------------------------------------------------------
 
-#4  Concrete Crown  by Block Theory
-    Score: 1.61 / 3.67
+#3  Rooftop Lights  by Indigo Parade
+    Score: 2.46 / 3.67
     Why:
-      - energy is close to your target (+1.15)
-      - acousticness is close to your target (+0.46)
+      - energy is close to your target (+1.06)
+      - mood matches 'happy' (+1.00)
+      - acousticness is close to your target (+0.40)
 ------------------------------------------------------------
 
-#5  Night Drive Loop  by Neon Echo
-    Score: 1.60 / 3.67
+#4  Storm Runner  by Voltline
+    Score: 1.57 / 3.67
     Why:
-      - energy is close to your target (+1.11)
-      - acousticness is close to your target (+0.49)
+      - energy is close to your target (+1.10)
+      - acousticness is close to your target (+0.47)
+------------------------------------------------------------
+
+#5  Concrete Crown  by Block Theory
+    Score: 1.57 / 3.67
+    Why:
+      - energy is close to your target (+1.09)
+      - acousticness is close to your target (+0.48)
 ------------------------------------------------------------
 ```
+
+The program then prints the same block for the other nine profiles.
 
 ---
 
 ## Profile Evaluation Output
 
-Full terminal output of `py src/main.py` for the three baseline profiles and the seven adversarial profiles (`PROFILES` and `ADVERSARIAL_PROFILES` in `src/main.py`), top 5 each.
+Terminal output of `python -m src.main` for the three baseline profiles and the seven adversarial profiles (`PROFILES` and `ADVERSARIAL_PROFILES` in `src/main.py`), top 5 each. The banner line above each block is left out.
 
 ### High-Energy Pop
 
